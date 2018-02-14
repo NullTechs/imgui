@@ -36,7 +36,7 @@
 
 // Helpers
 // Some compilers support applying printf-style warnings to user functions.
-#if defined(__clang__) || defined(__GNUC__)
+#if 0 // defined(__clang__) || defined(__GNUC__)
 #define IM_FMTARGS(FMT)             __attribute__((format(printf, FMT, FMT+1)))
 #define IM_FMTLIST(FMT)             __attribute__((format(printf, FMT, 0)))
 #else
@@ -836,6 +836,7 @@ enum ImGuiStyleVar_
     ImGuiStyleVar_GrabMinSize,         // float     GrabMinSize
     ImGuiStyleVar_GrabRounding,        // float     GrabRounding
     ImGuiStyleVar_ButtonTextAlign,     // ImVec2    ButtonTextAlign
+    ImGuiStyleVar_ViewId,              // uint8_t
     ImGuiStyleVar_Count_
 
     // Obsolete names (will be removed)
@@ -928,6 +929,7 @@ struct ImGuiStyle
     float       ScrollbarSize;              // Width of the vertical scrollbar, Height of the horizontal scrollbar.
     float       ScrollbarRounding;          // Radius of grab corners for scrollbar.
     float       GrabMinSize;                // Minimum width/height of a grab box for slider/scrollbar.
+    float       ViewId;
     float       GrabRounding;               // Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
     ImVec2      ButtonTextAlign;            // Alignment of button text when button is larger than text. Defaults to (0.5f,0.5f) for horizontally+vertically centered.
     ImVec2      DisplayWindowPadding;       // Window positions are clamped to be visible within the display area by at least this amount. Only covers regular windows.
@@ -1418,8 +1420,9 @@ struct ImDrawCmd
     ImTextureID     TextureId;              // User-provided texture ID. Set by user in ImfontAtlas::SetTexID() for fonts or passed to Image*() functions. Ignore if never using images or multiple fonts atlas.
     ImDrawCallback  UserCallback;           // If != NULL, call the function instead of rendering the vertices. clip_rect and texture_id will be set normally.
     void*           UserCallbackData;       // The draw callback code can access this.
+    unsigned short  ViewId;
 
-    ImDrawCmd() { ElemCount = 0; ClipRect.x = ClipRect.y = ClipRect.z = ClipRect.w = 0.0f; TextureId = NULL; UserCallback = NULL; UserCallbackData = NULL; }
+    ImDrawCmd() { ElemCount = 0; ClipRect.x = ClipRect.y = ClipRect.z = ClipRect.w = 0.0f; TextureId = NULL; UserCallback = NULL; UserCallbackData = NULL; ViewId = 0; }
 };
 
 // Vertex index (override with '#define ImDrawIdx unsigned int' inside in imconfig.h)
