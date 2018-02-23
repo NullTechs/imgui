@@ -250,6 +250,7 @@
  Here is a change-log of API breaking changes, if you are using one of the functions listed, expect to have to fix some code.
  Also read releases logs https://github.com/ocornut/imgui/releases for more details.
 
+ - 2018/02/18 (1.60) - BeginDragDropSource(): temporarily removed the optional mouse_button=0 parameter because it is really usable in typical conditions at the moment. 
  - 2018/02/16 (1.60) - obsoleted the io.RenderDrawListsFn callback, you can call your graphics engine render function after ImGui::Render(). Use ImGui::GetDrawData() to retrieve the ImDrawData* to display.
  - 2018/02/07 (1.60) - reorganized context handling to be more explicit,
                        - YOU NOW NEED TO CALL ImGui::CreateContext() AT THE BEGINNING OF YOUR APP, AND CALL ImGui::DestroyContext() AT THE END.
@@ -953,14 +954,13 @@ ImVec2 ImLineClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& p)
 {
     ImVec2 ap = p - a;
     ImVec2 ab_dir = b - a;
-    float ab_len = sqrtf(ab_dir.x * ab_dir.x + ab_dir.y * ab_dir.y);
-    ab_dir *= 1.0f / ab_len;
     float dot = ap.x * ab_dir.x + ap.y * ab_dir.y;
     if (dot < 0.0f)
         return a;
-    if (dot > ab_len)
+    float ab_len_sqr = ab_dir.x * ab_dir.x + ab_dir.y * ab_dir.y;
+    if (dot > ab_len_sqr)
         return b;
-    return a + ab_dir * dot;
+    return a + ab_dir * dot / ab_len_sqr;
 }
 
 bool ImTriangleContainsPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p)
@@ -2351,7 +2351,7 @@ static bool NavMoveRequestButNoResultYet()
     return g.NavMoveRequest && g.NavMoveResultLocal.ID == 0 && g.NavMoveResultOther.ID == 0;
 }
 
-static void NavMoveRequestCancel()
+void ImGui::NavMoveRequestCancel()
 {
     ImGuiContext& g = *GImGui;
     g.NavMoveRequest = false;
@@ -5008,7 +5008,7 @@ static void NavProcessMoveRequestWrapAround(ImGuiWindow* window)
         if ((g.NavMoveDir == ImGuiDir_Up || g.NavMoveDir == ImGuiDir_Down) && g.NavMoveRequestForward == ImGuiNavForward_None && g.NavLayer == 0)
         {
             g.NavMoveRequestForward = ImGuiNavForward_ForwardQueued;
-            NavMoveRequestCancel();
+            ImGui::NavMoveRequestCancel();
             g.NavWindow->NavRectRel[0].Min.y = g.NavWindow->NavRectRel[0].Max.y = ((g.NavMoveDir == ImGuiDir_Up) ? ImMax(window->SizeFull.y, window->SizeContents.y) : 0.0f) - window->Scroll.y;
         }
 }
@@ -12748,7 +12748,7 @@ void ImGui::ClearDragDrop()
 
 // Call when current ID is active. 
 // When this returns true you need to: a) call SetDragDropPayload() exactly once, b) you may render the payload visual/description, c) call EndDragDropSource()
-bool ImGui::BeginDragDropSource(ImGuiDragDropFlags flags, int mouse_button)
+bool ImGui::BeginDragDropSource(ImGuiDragDropFlags flags)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
@@ -12756,6 +12756,7 @@ bool ImGui::BeginDragDropSource(ImGuiDragDropFlags flags, int mouse_button)
     bool source_drag_active = false;
     ImGuiID source_id = 0;
     ImGuiID source_parent_id = 0;
+    int mouse_button = 0;
     if (!(flags & ImGuiDragDropFlags_SourceExtern))
     {
         source_id = window->DC.LastItemId;
