@@ -12,9 +12,9 @@
 
 #define IMGUI_MAX_POSSIBLE_BACK_BUFFERS 16
 #define IMGUI_UNLIMITED_FRAME_RATE
-//#ifdef _DEBUG
-//#define IMGUI_VULKAN_DEBUG_REPORT
-//#endif
+#ifdef _DEBUG
+#define IMGUI_VULKAN_DEBUG_REPORT
+#endif
 
 static VkAllocationCallbacks*   g_Allocator = NULL;
 static VkInstance               g_Instance = VK_NULL_HANDLE;
@@ -34,7 +34,9 @@ static VkPresentModeKHR         g_PresentMode;
 static VkPipelineCache          g_PipelineCache = VK_NULL_HANDLE;
 static VkDescriptorPool         g_DescriptorPool = VK_NULL_HANDLE;
 
-static int                      fb_width, fb_height;
+static int                      fb_width = 0, fb_height = 0;
+static bool                     g_ResizeWanted = false;
+static int                      g_ResizeWidth = 0, g_ResizeHeight = 0;
 static uint32_t                 g_BackbufferIndices[IMGUI_VK_QUEUED_FRAMES];    // keep track of recently rendered swapchain frame indices
 static uint32_t                 g_BackBufferCount = 0;
 static VkImage                  g_BackBuffer[IMGUI_MAX_POSSIBLE_BACK_BUFFERS] = {};
@@ -58,7 +60,7 @@ static void check_vk_result(VkResult err)
         abort();
 }
 
-static void resize_vulkan(GLFWwindow* /*window*/, int w, int h)
+static void resize_vulkan(int w, int h)
 {
     VkResult err;
     VkSwapchainKHR old_swapchain = g_Swapchain;
@@ -355,7 +357,7 @@ static void setup_vulkan(GLFWwindow* window)
 
     // Get Present Mode
     {
-        // Requst a certain mode and confirm that it is available. If not use VK_PRESENT_MODE_FIFO_KHR which is mandatory
+        // Request a certain mode and confirm that it is available. If not use VK_PRESENT_MODE_FIFO_KHR which is mandatory
 #ifdef IMGUI_UNLIMITED_FRAME_RATE
         g_PresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
 #else
@@ -406,8 +408,7 @@ static void setup_vulkan(GLFWwindow* window)
     {
         int w, h;
         glfwGetFramebufferSize(window, &w, &h);
-        resize_vulkan(window, w, h);
-        glfwSetFramebufferSizeCallback(window, resize_vulkan);
+        resize_vulkan(w, h);
     }
 
     // Create Command Buffers
@@ -568,19 +569,12 @@ static void frame_end()
 static void frame_present()
 {
     VkResult err;
-    // If IMGUI_UNLIMITED_FRAME_RATE is defined we present the latest but one frame. Otherwise we present the latest rendered frame
-#ifdef IMGUI_UNLIMITED_FRAME_RATE
-    uint32_t PresentIndex = (g_FrameIndex + IMGUI_VK_QUEUED_FRAMES - 1) % IMGUI_VK_QUEUED_FRAMES;
-#else
-    uint32_t PresentIndex = g_FrameIndex;
-#endif // IMGUI_UNLIMITED_FRAME_RATE
-
     VkSwapchainKHR swapchains[1] = {g_Swapchain};
-    uint32_t indices[1] = {g_BackbufferIndices[PresentIndex]};
+    uint32_t indices[1] = {g_BackbufferIndices[g_FrameIndex]};
     VkPresentInfoKHR info = {};
     info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     info.waitSemaphoreCount = 1;
-    info.pWaitSemaphores = &g_RenderCompleteSemaphore[PresentIndex];
+    info.pWaitSemaphores = &g_RenderCompleteSemaphore[g_FrameIndex];
     info.swapchainCount = 1;
     info.pSwapchains = swapchains;
     info.pImageIndices = indices;
@@ -590,15 +584,22 @@ static void frame_present()
     g_FrameIndex = (g_FrameIndex + 1) % IMGUI_VK_QUEUED_FRAMES;
 }
 
-static void error_callback(int error, const char* description)
+static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error %d: %s\n", error, description);
+}
+
+static void glfw_resize_callback(GLFWwindow*, int w, int h)
+{
+    g_ResizeWanted = true;
+    g_ResizeWidth = w;
+    g_ResizeHeight = h;
 }
 
 int main(int, char**)
 {
     // Setup window
-    glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
 
@@ -612,6 +613,7 @@ int main(int, char**)
         return 1;
     }
     setup_vulkan(window);
+    glfwSetFramebufferSizeCallback(window, glfw_resize_callback);
 
     // Setup ImGui binding
     ImGui::CreateContext();
@@ -678,16 +680,6 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    // When IMGUI_UNLIMITED_FRAME_RATE is defined we render into latest image acquired from the swapchain but we display the image which was rendered before.
-    // Hence we must render once and increase the g_FrameIndex without presenting, which we do before entering the render loop.
-    // This is also the reason why frame_end() is split into frame_end() and frame_present(), the later one not being called here.
-#ifdef IMGUI_UNLIMITED_FRAME_RATE
-    ImGui_ImplGlfwVulkan_NewFrame();
-    frame_begin();
-    ImGui_ImplGlfwVulkan_Render(g_CommandBuffer[g_FrameIndex]);
-    frame_end();
-    g_FrameIndex = (g_FrameIndex + 1) % IMGUI_VK_QUEUED_FRAMES;
-#endif // IMGUI_UNLIMITED_FRAME_RATE
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -697,6 +689,11 @@ int main(int, char**)
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
+
+        if (g_ResizeWanted)
+            resize_vulkan(g_ResizeWidth, g_ResizeHeight);
+        g_ResizeWanted = false;
+
         ImGui_ImplGlfwVulkan_NewFrame();
 
         // 1. Show a simple window.
