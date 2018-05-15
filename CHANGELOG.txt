@@ -37,6 +37,17 @@ HOW TO UPDATE?
 
 -----------------------------------------------------------------------
 
+VERSION 1.62 WIP (IN PROGRESS)
+
+Breaking Changes:
+
+Other Changes:
+
+ - Nav: To keep the navigated item in view we also attempt to scroll the parent window as well as the current window. (#787)
+ - TreeNode: Fixed nodes with ImGuiTreeNodeFlags_Leaf flag always returning true which was meaningless.
+
+-----------------------------------------------------------------------
+
 VERSION 1.61 (Released 2018-05-14)
 
 Breaking Changes:
