@@ -163,7 +163,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - tooltip: drag and drop with tooltip near monitor edges lose/changes its last direction instead of locking one. The drag and drop tooltip should always follow without changing direction.
  - tooltip: tooltip that doesn't fit in entire screen seems to lose their "last preferred direction" and may teleport when moving mouse.
  - tooltip: allow to set the width of a tooltip to allow TextWrapped() etc. while keeping the height automatic.
- - tooltip: allow tooltips with timers? or general timer policy? (instantaneous vs timed)
+ - tooltip: tooltips with delay timers? or general timer policy? (instantaneous vs timed) (#1485)
  
  - menus: calling BeginMenu() twice with a same name doesn't append as Begin() does for regular windows (#1207)
  - menus: menu bars inside modals windows are acting weird.
@@ -216,9 +216,11 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - filters: fuzzy matches (may use code at blog.forrestthewoods.com/4cffeed33fdb)
 
  - drag and drop: add demo. (#143, #479)
+ - drag and drop: have some way to know when a drag begin from BeginDragDropSource() pov
  - drag and drop: allow using with other mouse buttons (where activeid won't be set). (#1637)
  - drag and drop: test with reordering nodes (in a list, or a tree node). (#143)
  - drag and drop: test integrating with os drag and drop.
+ - drag and drop: make payload optional? (#143)
  - node/graph editor (#306)
  - pie menus patterns (#434)
  - markup: simple markup language for color change? (#902)
@@ -296,6 +298,7 @@ It's mostly a bunch of personal notes, probably incomplete. Feel free to query i
  - demo: demonstration Plot offset
  - examples: window minimize, maximize (#583)
  - examples: provide a zero-framerate/idle example.
+ - examples: apple: apple_example should be using modern GL3.
  - examples: glfw: could go idle when minimized? if (glfwGetWindowAttrib(window, GLFW_ICONIFIED)) { glfwWaitEvents(); continue; } // issue: DeltaTime will be super high on resume, perhaps provide a way to let impl know (#440)
  - optimization: replace vsnprintf with stb_printf? or enable the defines/infrastructure to allow it (#1038)
  - optimization: add clipping for multi-component widgets (SliderFloatX, ColorEditX, etc.). one problem is that nav branch can't easily clip parent group when there is a move request.
