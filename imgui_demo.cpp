@@ -1,4 +1,4 @@
-// dear imgui, v1.62
+// dear imgui, v1.63 WIP
 // (demo code)
 
 // Message to the person tempted to delete this file when integrating ImGui into their code base:
@@ -2608,8 +2608,8 @@ static void ShowExampleAppSimpleOverlay(bool* p_open)
             if (p_open && ImGui::MenuItem("Close")) *p_open = false;
             ImGui::EndPopup();
         }
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 // Demonstrate using "##" and "###" in identifiers to manipulate ID generation.
