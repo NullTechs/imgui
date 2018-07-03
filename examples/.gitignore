@@ -6,7 +6,7 @@ build/*
 *.opensdf
 *.sdf
 *.suo
-*.vcxproj.user
+*.user
 *.o
 *.obj
 *.exe
@@ -20,6 +20,10 @@ build/*
 .DS_Store
 project.xcworkspace
 xcuserdata
+
+## Emscripten output
+*.out.js
+*.out.wasm
 
 ## Unix executables
 example_glfw_opengl2/example_glfw_opengl2
