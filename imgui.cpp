@@ -1836,37 +1836,41 @@ bool ImGuiTextFilter::Draw(const char* label, float width)
     return value_changed;
 }
 
-void ImGuiTextFilter::TextRange::split(char separator, ImVector<TextRange>& out)
+void ImGuiTextFilter::TextRange::split(char separator, ImVector<TextRange>* out) const
 {
-    out.resize(0);
+    out->resize(0);
     const char* wb = b;
     const char* we = wb;
     while (we < e)
     {
         if (*we == separator)
         {
-            out.push_back(TextRange(wb, we));
+            out->push_back(TextRange(wb, we));
             wb = we + 1;
         }
         we++;
     }
     if (wb != we)
-        out.push_back(TextRange(wb, we));
+        out->push_back(TextRange(wb, we));
 }
 
 void ImGuiTextFilter::Build()
 {
     Filters.resize(0);
     TextRange input_range(InputBuf, InputBuf+strlen(InputBuf));
-    input_range.split(',', Filters);
+    input_range.split(',', &Filters);
 
     CountGrep = 0;
     for (int i = 0; i != Filters.Size; i++)
     {
-        Filters[i].trim_blanks();
-        if (Filters[i].empty())
+        TextRange& f = Filters[i];
+        while (f.b < f.e && ImCharIsBlankA(f.b[0]))
+            f.b++;
+        while (f.e > f.b && ImCharIsBlankA(f.e[-1]))
+            f.e--;
+        if (f.empty())
             continue;
-        if (Filters[i].front() != '-')
+        if (Filters[i].b[0] != '-')
             CountGrep += 1;
     }
 }
@@ -1884,7 +1888,7 @@ bool ImGuiTextFilter::PassFilter(const char* text, const char* text_end) const
         const TextRange& f = Filters[i];
         if (f.empty())
             continue;
-        if (f.front() == '-')
+        if (f.b[0] == '-')
         {
             // Subtract
             if (ImStristr(text, text_end, f.begin()+1, f.end()) != NULL)
@@ -3192,11 +3196,7 @@ static const char* GetFallbackWindowNameForWindowingList(ImGuiWindow* window)
 void ImGui::NavUpdateWindowingList()
 {
     ImGuiContext& g = *GImGui;
-    if (!g.NavWindowingTarget)
-    {
-        g.NavWindowingList = NULL;
-        return;
-    }
+    IM_ASSERT(g.NavWindowingTarget != NULL);
 
     if (g.NavWindowingList == NULL)
         g.NavWindowingList = FindWindowByName("###NavWindowingList");
@@ -4391,14 +4391,17 @@ void ImGui::EndFrame()
         g.PlatformImeLastPos = g.PlatformImePos;
     }
 
-    NavUpdateWindowingList();
-
     // Hide implicit "Debug" window if it hasn't been used
     IM_ASSERT(g.CurrentWindowStack.Size == 1);    // Mismatched Begin()/End() calls, did you forget to call end on g.CurrentWindow->Name?
     if (g.CurrentWindow && !g.CurrentWindow->WriteAccessed)
         g.CurrentWindow->Active = false;
     End();
 
+    // Show CTRL+TAB list
+    if (g.NavWindowingTarget)
+        NavUpdateWindowingList();
+
+    // Initiate moving window
     if (g.ActiveId == 0 && g.HoveredId == 0)
     {
         if (!g.NavWindow || !g.NavWindow->Appearing) // Unless we just made a window/popup appear
@@ -4472,7 +4475,7 @@ void ImGui::Render()
     g.DrawDataBuilder.Clear();
     ImGuiWindow* windows_to_render_front_most[2];
     windows_to_render_front_most[0] = (g.NavWindowingTarget && !(g.NavWindowingTarget->Flags & ImGuiWindowFlags_NoBringToFrontOnFocus)) ? g.NavWindowingTarget->RootWindow : NULL;
-    windows_to_render_front_most[1] = (g.NavWindowingList);
+    windows_to_render_front_most[1] = g.NavWindowingTarget ? g.NavWindowingList : NULL;
     for (int n = 0; n != g.Windows.Size; n++)
     {
         ImGuiWindow* window = g.Windows[n];
