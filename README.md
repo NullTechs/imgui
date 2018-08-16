@@ -125,7 +125,7 @@ Languages: (third-party bindings)
 - Swift [swift-imgui](https://github.com/mnmly/Swift-imgui)
 
 Frameworks:
-- Renderers: DirectX 9, DirectX 10, DirectX 11, DirectX 12, Metal, OpenGL2, OpenGL3+, Vulkan: [examples/](https://github.com/ocornut/imgui/tree/master/examples)
+- Renderers: DirectX 9, DirectX 10, DirectX 11, DirectX 12, Metal, OpenGL2, OpenGL3+/ES2/ES3, Vulkan: [examples/](https://github.com/ocornut/imgui/tree/master/examples)
 - Platform: GLFW, SDL, Win32, OSX, Freeglut: [examples/](https://github.com/ocornut/imgui/tree/master/examples)
 - Framework: Allegro 5, Marmalade: [examples/](https://github.com/ocornut/imgui/tree/master/examples)
 - Unmerged PR: SDL2 + OpenGLES + Emscripten: [#336](https://github.com/ocornut/imgui/pull/336)
@@ -168,7 +168,7 @@ User screenshots:
 <br>[Gallery Part 3](https://github.com/ocornut/imgui/issues/772) (Aug 2016 to Jan 2017)
 <br>[Gallery Part 4](https://github.com/ocornut/imgui/issues/973) (Jan 2017 to Aug 2017)
 <br>[Gallery Part 5](https://github.com/ocornut/imgui/issues/1269) (Aug 2017 to Feb 2018)
-<br>[Gallery Part 6](https://github.com/ocornut/imgui/issues/1607) (Feb 2018 onward)
+<br>[Gallery Part 6](https://github.com/ocornut/imgui/issues/1607) (Feb 2018 to June 2018)
 <br>[Gallery Part 7](https://github.com/ocornut/imgui/issues/1902) (June 2018 onward)
 <br>Also see the [Mega screenshots](https://github.com/ocornut/imgui/issues/1273) for an idea of the available features.
 
@@ -238,6 +238,7 @@ The library started its life and is best known as "ImGui" only due to the fact t
 <b>How can I tell whether to dispatch mouse/keyboard to imgui or to my application?</b>
 <br><b>How can I display an image? What is ImTextureID, how does it works?</b>
 <br><b>How can I have multiple widgets with the same label or without a label? A primer on labels and the ID Stack.</b>
+<br><b>How can I use my own math types instead of ImVec2/ImVec4?</b>
 <br><b>How can I load a different font than the default?</b>
 <br><b>How can I easily use icons in my application?</b>
 <br><b>How can I load multiple fonts?</b>
