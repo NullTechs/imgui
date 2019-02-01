@@ -33,6 +33,10 @@ HOW TO UPDATE?
  VERSION 1.68 (In progress)
 -----------------------------------------------------------------------
 
+Breaking Changes:
+
+- Removed io.DisplayVisibleMin/DisplayVisibleMax (which were marked obsolete and removed from viewport/docking branch already).
+
 Other Changes:
 - Added .editorconfig file for text editors to standardize using spaces. (#2038) [@kudaba]
 - InputText: Fixed a bug where ESCAPE would not restore the initial value in all situations. (#2321) [@relick]
@@ -52,6 +56,7 @@ Other Changes:
 - Examples: Win32: Added support for XInput games (if ImGuiConfigFlags_NavEnableGamepad is enabled).
 - Examples: Win32: Added support for mouse buttons 4 and 5 via WM_XBUTTON* messages. (#2264)
 - Examples: DirectX9: Explicitly disable fog (D3DRS_FOGENABLE) before drawing in case user state has it set. (#2288, #2230)
+- Examples: OpenGL3: Using GLSL 4.10 shaders for any GLSL version over 410 (e.g. 430, 450). (#2329) [@BrutPitt]
 
 
 -----------------------------------------------------------------------
