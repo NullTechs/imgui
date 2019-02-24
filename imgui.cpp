@@ -8932,6 +8932,8 @@ void ImGui::LogFinish()
         if (!g.LogBuffer.empty())
             SetClipboardText(g.LogBuffer.begin());
         break;
+    case ImGuiLogType_None:
+        break;
     }
 
     g.LogEnabled = false;
