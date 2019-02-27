@@ -33,6 +33,12 @@ HOW TO UPDATE?
  VERSION 1.69 (In Progress)
 -----------------------------------------------------------------------
 
+Breaking Changes:
+
+- Renamed ColorEdit/ColorPicker's ImGuiColorEditFlags_RGB/_HSV/_HEX flags to respectively
+  ImGuiColorEditFlags_DisplayRGB/_DisplayHSV/_DisplayHex. This is anticipation of adding new
+  flags to ColorEdit/ColorPicker functions which would make those ambiguous. (#2384) [@haldean]
+
 Other Changes:
 
 - Nav: Fixed a tap on AltGR (e.g. German keyboard) from navigation to the menu layer.
@@ -47,6 +53,7 @@ Other Changes:
 - TabBar: Fixed a crash when using BeginTabBar() recursively (didn't affect docking). (#2371)
 - TabBar: Added extra mis-usage error recovery. Past the assert, common mis-usage don't lead to
   hard crashes any more, facilitating integration with scripting languages. (#1651)
+- Plot: Fixed divide-by-zero in PlotLines() when passing a count of 1. (#2387) [@Lectem]
 - Log/Capture: Fixed extraneous leading carriage return.
 - Log/Capture: Fixed an issue when empty string on a new line would not emit a carriage return.
 - Log/Capture: Fixed LogXXX functions 'auto_open_depth' parameter being treated as an absolute
@@ -54,6 +61,7 @@ Other Changes:
 - Log/Capture: Fixed CollapsingHeader trailing ascii representation being "#" instead of "##".
 - Examples: OpenGL: Fix for OSX not supporting OpenGL 4.5, we don't try to read GL_CLIP_ORIGIN
   even if the OpenGL headers/loader happens to define the value. (#2366, #2186)
+- Examples: Allegro: Added support for touch events (emulating mouse). (#2219) [@dos1]
 
 
 -----------------------------------------------------------------------
