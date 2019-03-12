@@ -75,6 +75,8 @@ Other Changes:
   hard crashes any more, facilitating integration with scripting languages. (#1651)
 - TabBar: Fixed ImGuiTabItemFlags_SetSelected being ignored if the tab is not visible (with
   scrolling policy enabled) or if is currently appearing.
+- TabBar: Fixed Tab tooltip code making drag and drop tooltip disappear during the frame where
+  the drag payload activate a tab.
 - Text: Fixed large Text/TextUnformatted call not declaring its size when starting below the
   lower point of the current clipping rectangle. Somehow this bug has been there since v1.0!
   It was hardly noticeable but would affect the scrolling range, which in turn would affect
@@ -85,8 +87,13 @@ Other Changes:
 - Log/Capture: Fixed LogXXX functions 'auto_open_depth' parameter being treated as an absolute
   tree depth instead of a relative one.
 - Log/Capture: Fixed CollapsingHeader trailing ascii representation being "#" instead of "##".
+- ImFont: Added GetGlyphRangesVietnamese() helper. (#2403)
 - Misc: Asserting in NewFrame() if style.WindowMinSize is zero or smaller than (1.0f,1.0f).
 - Demo: Using GetBackgroundDrawList() and GetForegroundDrawList() in "Custom Rendering" demo.
+- Demo: InputText: Demonstrating use of ImGuiInputTextFlags_CallbackResize. (#2006, #1443, #1008).
+- Examples: GLFW, SDL: Preserve DisplayFramebufferScale when main viewport is minimized.
+  (This is particularly useful for the viewport branch because we are not supporting per-viewport
+  frame-buffer scale. It fixes windows not refreshing when main viewport is minimized.) (#2416)
 - Examples: OpenGL: Fix to be able to run on ES 2.0 / WebGL 1.0. [@rmitton, @gabrielcuvillier]
 - Examples: OpenGL: Fix for OSX not supporting OpenGL 4.5, we don't try to read GL_CLIP_ORIGIN
   even if the OpenGL headers/loader happens to define the value. (#2366, #2186)
