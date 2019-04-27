@@ -58,11 +58,13 @@ Other Changes:
   One of the noticeable minor side effect was that navigating menus would have had a tendency to disable
   highlight from parent menu items earlier than necessary while approaching the child menu.
 - Window: Close button is horizontally aligned with style.FramePadding.x.
+- Window: Fixed contents region being off by WindowBorderSize amount on the right when scrollbar is active.
 - GetMouseDragDelta(): also returns the delta on the mouse button released frame. (#2419)
 - GetMouseDragDelta(): verify that mouse positions are valid otherwise returns zero.
 - Inputs: Also add support for horizontal scroll with Shift+Mouse Wheel. (#2424, #1463) [@LucaRood]
 - PlotLines, PlotHistogram: Ignore NaN values when calculating min/max bounds. (#2485)
-- Columns: Fixed boundary of clipping being off by 1 pixel within the left column.
+- Columns: Fixed boundary of clipping being off by 1 pixel within the left column. (#125)
+- Separator: Declare its thickness (1.0f) to the layout, making items around separator more symmetrical.
 - Combo, Slider, Scrollbar: Improve rendering in situation when there's only a few pixels available (<3 pixels).
 - Nav: Fixed Drag/Slider functions going into text input mode when keyboard CTRL is held while pressing NavActivate.
 - Misc: Added IM_MALLOC/IM_FREE macros mimicking IM_NEW/IM_DELETE so user doesn't need to revert
